@@ -384,4 +384,28 @@ class CurrentLibControllerTestExpectedData {
 		return '#' . $result . '#';
 	}
 
+/**
+ * グループ選択画面表示の期待値
+ *
+ * @param array $keys 当メソッドで内部的に処理するキーリスト
+ * @return array assertContains(assertNotContains)の結果配列
+ * @SuppressWarnings(PHPMD.CyclomaticComplexity)
+ */
+	public function getExpectedGetGroupSelect($keys) {
+		$results = [];
+
+		foreach ($keys as $key) {
+			switch ($key) {
+				case 'title':
+					$results[] = '<h4 class="modal-title">グループ選択&nbsp;</h4>';
+					break;
+				case 'administrator':
+					$results[] = '&quot;User&quot;:{&quot;id&quot;:&quot;1&quot;}';
+					break;
+			}
+		}
+
+		return $results;
+	}
+
 }

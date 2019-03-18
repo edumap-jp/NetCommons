@@ -84,6 +84,7 @@ class NetCommonsLibCurrentLibControllerAdministratorGetTest extends ControllerTe
  * @dataProvider dataGetRequestPrivatePlanOfGeneralUser1
  * @dataProvider dataGetRequestBbsArticleOfCommunity
  * @dataProvider dataGetRequestPublicCalendarPage
+ * @dataProvider dataGetRequestGroupSelect
  *
  * @return void
  */
@@ -388,30 +389,24 @@ class NetCommonsLibCurrentLibControllerAdministratorGetTest extends ControllerTe
  * @return array テストデータ
  */
 	public function dataGetRequestGroupSelect() {
-//		//@var CurrentLibControllerTestExpectedData
-//		$ExpectedData = new CurrentLibControllerTestExpectedData();
-//
-//		$results = [
-//			'グループ選択画面表示' => [
-//				'controller' => 'Groups.Groups',
-//				'url' => '/groups/groups/select/1',
-//				'expects' => [
-////					'assertContains' => array_merge(
-////						$ExpectedData->getExpectedAnnouncement(['private']),
-////						$ExpectedData->getExpectedFrame(['menu']),
-////						$ExpectedData->getExpectedMenuList([
-////							'public', 'private', 'community_1', 'community_2'
-////						]),
-////						$ExpectedData->getExpectedSettingMode('on')
-////					),
-////					'assertNotContains' => [],
-////					'assertRegExp' => array_merge([],
-////						$ExpectedData->getExpectedActiveMenu('private_administrator')
-////					),
-//				],
-//				'exception' => false,
-//			],
-//		];
+		//@var CurrentLibControllerTestExpectedData
+		$ExpectedData = new CurrentLibControllerTestExpectedData();
+
+		$results = [
+			'グループ選択画面表示' => [
+				'controller' => 'Groups.Groups',
+				'url' => '/groups/groups/select/1',
+				'expects' => [
+					'assertContains' => array_merge([],
+						$ExpectedData->getExpectedGetGroupSelect([
+							'title', 'administrator'
+						])
+					),
+					'assertNotContains' => [],
+				],
+				'exception' => false,
+			],
+		];
 
 		return $results;
 	}
