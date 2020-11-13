@@ -8,6 +8,7 @@
  * @license http://www.netcommons.org/license.txt NetCommons License
  * @copyright Copyright 2014, NetCommons Project
  */
+$this->assign('meta', '<meta name="robots" content="noindex,nofollow,noarchive"/>');
 ?>
 
 <?php echo $siteClosingReason;
