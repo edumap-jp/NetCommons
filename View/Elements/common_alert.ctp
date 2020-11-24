@@ -18,7 +18,7 @@
 
 <script>
 	$('.close').click(function() {
-		$('#nc-flash-message').fadeOut(500);
+		$('#nc-flash-message').stop(true).fadeOut(0);
 		return false;
 	});
 
