@@ -9,7 +9,8 @@
  */
 ?>
 
-<div id="nc-flash-message" class="alert alert-<?php echo h($class); ?> alert-dismissable">
+<div id="nc-flash-message" class="alert alert-<?php echo h($class); ?> alert-dismissable"
+	<?php if ($is_dismissed) { echo 'style="opacity: 0; pointer-events: none;"'; } ?>>
 	<button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
 	<div>
 		<?php echo $message; ?>
@@ -23,7 +24,7 @@
 	});
 
 	<?php if ((int)$interval > 0) : ?>
-		$('#nc-flash-message').fadeIn(500).fadeTo(<?php echo (int)$interval; ?>, 1).fadeOut(2000);
+		$('#nc-flash-message').fadeIn(500).delay(<?php echo (int)$interval; ?>).fadeOut(2000);
 	<?php else: ?>
 		$('#nc-flash-message').fadeIn(500);
 	<?php endif; ?>

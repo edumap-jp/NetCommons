@@ -352,4 +352,76 @@ NetCommonsApp.controller('NetCommons.base',
               function() {
               });
         };
+
+        /**
+         * Update a flash message using mitou-ml by WillBooster Inc.
+         *
+         * @param {int} topicCount
+         * @return {void}
+         */
+        $scope.updateMotivatingFlashMessage = function(userId) {
+          var recommenderUrl = 'https://edumap-staging-auj4tlfysa-an.a.run.app';
+          var api_key = '9iMiBMHEWeCExz2ZZDqGsJtNbYjubN4u';
+
+          function getIncentiveRecommendation(query) {
+            var url = recommenderUrl + '/api/recommenders/' + query.recommenderId + '/incentives/recommend';
+            return fetchWithSign(url, 'POST', JSON.stringify({ ...query, recommenderId: undefined })).then(function(response) {
+              return response.json();
+            });
+          }
+
+          function fetchWithSign(url, method, body) {
+            var headers = new Headers();
+
+            var dateStr = new Date().toISOString();
+            var rawHeader = method + '\n'
+              + new URL(url).pathname + '\n'
+              + '\n'
+              + 'content-length:' + (body ? body.length : 0) + '\n'
+              + 'x-mitou-ml-date:' + dateStr + '\n'
+              + api_key;
+            headers.append('x-mitou-ml-date', dateStr);
+
+            return sha512(rawHeader).then(function(v) {
+              headers.append('x-mitou-ml-sign', v);
+
+              if (body) {
+                headers.append('content-type', 'application/json');
+              }
+              return fetch(url, {
+                method,
+                headers,
+                body,
+              }).then(function(response) {
+                if (!response.ok) {
+                  response.text().then(function(text) {
+                    throw Error('Failed to fetch ' + url + ': ' + text);
+                  });
+                }
+                return response;
+              });
+            })
+          }
+
+          function sha512(str) {
+            return $window.crypto.subtle.digest('SHA-512', new TextEncoder().encode(str)).then(function(buf) {
+              return Array.prototype.map.call(new Uint8Array(buf), function(x) {
+                return ('00' + x.toString(16)).slice(-2);
+              }).join('');
+            });
+          }
+
+          var query = {
+            userId,
+            recommenderId: 'encourage_submission',
+          };
+
+          getIncentiveRecommendation(query).then(function(response) {
+            $("#nc-flash-message div").text(response.content.message);
+            // Remove `style="opacity: 0;"`.
+            $("#nc-flash-message").removeAttr('style');
+          }).catch(function(error) {
+            console.error('updateMotivatingFlashMessage:', error);
+          });
+        };
       }]);

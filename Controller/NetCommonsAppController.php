@@ -503,5 +503,4 @@ class NetCommonsAppController extends Controller {
 			$this->autoRender = false;
 		}
 	}
-
 }
