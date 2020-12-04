@@ -387,7 +387,7 @@ NetCommonsApp.controller('NetCommons.base',
         /**
          * Update a flash message using mitou-ml provided by WillBooster Inc.
          *
-         * @param {int} topicCount
+         * @param {string} userId
          * @return {void}
          */
         $scope.updateMotivatingFlashMessage = function(userId) {
@@ -434,7 +434,7 @@ NetCommonsApp.controller('NetCommons.base',
           }
 
           function sha512(str) {
-            return $window.crypto.subtle.digest('SHA-512', new TextEncoder().encode(str)).then(function(buf) {
+            return crypto.subtle.digest('SHA-512', new TextEncoder().encode(str)).then(function(buf) {
               return Array.prototype.map.call(new Uint8Array(buf), function(x) {
                 return ('00' + x.toString(16)).slice(-2);
               }).join('');
