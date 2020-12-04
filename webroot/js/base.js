@@ -171,6 +171,20 @@ NetCommonsApp.factory('ajaxSendPost', ['$http', '$q', 'NC3_URL', function($http,
 NetCommonsApp.controller('NetCommons.base',
     ['$scope', '$location', '$window', '$http', 'NC3_URL',
       function($scope, $location, $window, $http, NC3_URL) {
+        /**
+         * URL of mitou-ml provided by WillBooster Inc.
+         */
+        var mitouMlUrl = 'https://edumap-production-auj4tlfysa-an.a.run.app';
+        var edumapFunctionsUrl = 'https://asia-northeast1-edumap-prod-1e0b7.cloudfunctions.net';
+        var hostname = window.location.hostname;
+        var isStaging = hostname.endsWith('.dev.edumap.jp')
+          || hostname.endsWith('.local')
+          || hostname === 'localhost'
+          || /^(?:[0-9]{1,3}\.){3}[0-9]{1,3}$/.test(hostname);
+        if (isStaging) {
+          mitouMlUrl = 'https://edumap-staging-auj4tlfysa-an.a.run.app';
+          edumapFunctionsUrl = 'https://asia-northeast1-edumap-staging.cloudfunctions.net';
+        }
 
         /**
          * Base URL
@@ -354,25 +368,29 @@ NetCommonsApp.controller('NetCommons.base',
         };
 
         /**
-         * Wake mitou-ml up.
+         * Register school and wake up mitou-ml.
          *
-         * @return {Promise<string>}
+         * @return {void}
          */
-        $scope.wakeMitouMlUp = function() {
-          var mitouMlUrl = 'https://edumap-staging-auj4tlfysa-an.a.run.app';
-          return fetch(mitouMlUrl + '/wake-up').then(function(response) {
-            return response.text();
+        $scope.registerSchool = function() {
+          var body = JSON.stringify({ hostname: window.location.hostname });
+          fetch(edumapFunctionsUrl + '/api/schools', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body,
           });
+          fetch(mitouMlUrl + '/wake-up');
         }
 
         /**
-         * Update a flash message using mitou-ml by WillBooster Inc.
+         * Update a flash message using mitou-ml provided by WillBooster Inc.
          *
          * @param {int} topicCount
          * @return {void}
          */
         $scope.updateMotivatingFlashMessage = function(userId) {
-          var mitouMlUrl = 'https://edumap-staging-auj4tlfysa-an.a.run.app';
           var api_key = '9iMiBMHEWeCExz2ZZDqGsJtNbYjubN4u';
 
           function getIncentiveRecommendation(query) {
