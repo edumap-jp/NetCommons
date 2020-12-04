@@ -176,7 +176,7 @@ NetCommonsApp.controller('NetCommons.base',
          */
         var mitouMlUrl = 'https://edumap-production-auj4tlfysa-an.a.run.app';
         var edumapFunctionsUrl = 'https://asia-northeast1-edumap-prod-1e0b7.cloudfunctions.net';
-        var hostname = window.location.hostname;
+        var hostname = $window.location.hostname;
         var isStaging = hostname.endsWith('.dev.edumap.jp')
           || hostname.endsWith('.local')
           || hostname === 'localhost'
@@ -373,7 +373,7 @@ NetCommonsApp.controller('NetCommons.base',
          * @return {void}
          */
         $scope.registerSchool = function() {
-          var body = JSON.stringify({ hostname: window.location.hostname });
+          var body = JSON.stringify({ hostname });
           fetch(edumapFunctionsUrl + '/api/schools', {
             method: 'POST',
             headers: {
@@ -388,9 +388,10 @@ NetCommonsApp.controller('NetCommons.base',
          * Update a flash message using mitou-ml provided by WillBooster Inc.
          *
          * @param {string} userId
+         * @param {int} topicCount
          * @return {void}
          */
-        $scope.updateMotivatingFlashMessage = function(userId) {
+        $scope.updateMotivatingFlashMessage = function(userId, topicCount) {
           var api_key = '9iMiBMHEWeCExz2ZZDqGsJtNbYjubN4u';
 
           function getIncentiveRecommendation(query) {
@@ -434,7 +435,7 @@ NetCommonsApp.controller('NetCommons.base',
           }
 
           function sha512(str) {
-            return crypto.subtle.digest('SHA-512', new TextEncoder().encode(str)).then(function(buf) {
+            return $window.crypto.subtle.digest('SHA-512', new TextEncoder().encode(str)).then(function(buf) {
               return Array.prototype.map.call(new Uint8Array(buf), function(x) {
                 return ('00' + x.toString(16)).slice(-2);
               }).join('');
@@ -443,13 +444,24 @@ NetCommonsApp.controller('NetCommons.base',
 
           var query = {
             userId,
+            topicCount,
             recommenderId: 'encourage_submission',
           };
 
           getIncentiveRecommendation(query).then(function(response) {
-            $("#nc-flash-message div").text(response.content.message);
-            // Remove `style="opacity: 0;"`.
-            $("#nc-flash-message").removeAttr('style');
+            if (response.content.message) {
+              $("#nc-flash-message div").text(response.content.message);
+              if (response.content.color) {
+                $("#nc-flash-message")
+                  .removeClass("alert-info")
+                  .addClass("alert-" + response.content.color);
+              }
+              if (response.content.delay !== 0) {
+                $("#nc-flash-message").delay(response.content.delay || 5000).fadeOut(1000);
+              }
+              // Remove `style="opacity: 0;"`.
+              $("#nc-flash-message").removeAttr('style');
+            }
           }).catch(function(error) {
             console.error('updateMotivatingFlashMessage:', error);
           });
