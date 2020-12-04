@@ -114,6 +114,14 @@ if (empty($navbarStyle)) {
 
 					<?php if (AuthComponent::user()) : ?>
 						<li>
+							<?php echo $this->NetCommonsHtml->link('<span class="glyphicon glyphicon-hdd"></span>：' . $this->Number->toReadableSize($UploadedFileSize),
+								'/system_manager/system_manager/edit/',
+								array('escape' => false)); ?>
+						</li>
+					<?php endif; ?>
+
+					<?php if (AuthComponent::user()) : ?>
+						<li>
 							<?php echo $this->NetCommonsHtml->link(__d('net_commons', 'Logout'), '/auth/logout'); ?>
 						</li>
 					<?php else: ?>

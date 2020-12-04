@@ -92,6 +92,7 @@ class NetCommonsAppController extends Controller {
  */
 	public $uses = [
 		'M17n.Language',
+		'Files.UploadFile',
 	];
 
 /**
@@ -303,6 +304,20 @@ class NetCommonsAppController extends Controller {
 				Current::read('Frame.id') && ! Current::read('FramePublicLanguage.is_public')) {
 			return $this->setAction('emptyFrame');
 		}
+
+		// 使用中の容量の計測
+		Cache::set(array('duration' => '+3 hours'));
+		$total = Cache::read('UploadedFileSize');
+		if(!$total) {
+			$files = $this->UploadFile->find('all');
+			$total = 0;
+			foreach ($files as $file) {
+				$total += Hash::get($file, 'UploadFile.size', 0);
+			}
+			Cache::set(array('duration' => '+3 hours'));
+			Cache::write('UploadedFileSize', $total);
+		}
+		$this->set('UploadedFileSize', $total);
 	}
 
 /**
