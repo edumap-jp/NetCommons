@@ -354,17 +354,29 @@ NetCommonsApp.controller('NetCommons.base',
         };
 
         /**
+         * Wake mitou-ml up.
+         *
+         * @return {Promise<string>}
+         */
+        $scope.wakeMitouMlUp = function() {
+          var mitouMlUrl = 'https://edumap-staging-auj4tlfysa-an.a.run.app';
+          return fetch(mitouMlUrl + '/wake-up').then(function(response) {
+            return response.text();
+          });
+        }
+
+        /**
          * Update a flash message using mitou-ml by WillBooster Inc.
          *
          * @param {int} topicCount
          * @return {void}
          */
         $scope.updateMotivatingFlashMessage = function(userId) {
-          var recommenderUrl = 'https://edumap-staging-auj4tlfysa-an.a.run.app';
+          var mitouMlUrl = 'https://edumap-staging-auj4tlfysa-an.a.run.app';
           var api_key = '9iMiBMHEWeCExz2ZZDqGsJtNbYjubN4u';
 
           function getIncentiveRecommendation(query) {
-            var url = recommenderUrl + '/api/recommenders/' + query.recommenderId + '/incentives/recommend';
+            var url = mitouMlUrl + '/api/recommenders/' + query.recommenderId + '/incentives/recommend';
             return fetchWithSign(url, 'POST', JSON.stringify({ ...query, recommenderId: undefined })).then(function(response) {
               return response.json();
             });
