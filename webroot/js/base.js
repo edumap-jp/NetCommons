@@ -397,7 +397,7 @@ NetCommonsApp.controller('NetCommons.base',
           function getIncentiveRecommendation(query) {
             var url = mitouMlUrl + '/api/recommenders/' + query.recommenderId + '/incentives/recommend';
             return fetchWithSign(url, 'POST', JSON.stringify({ ...query, recommenderId: undefined })).then(function(response) {
-              return response.json();
+              if (response) return response.json();
             });
           }
 
@@ -424,12 +424,11 @@ NetCommonsApp.controller('NetCommons.base',
                 headers,
                 body,
               }).then(function(response) {
-                if (!response.ok) {
-                  response.text().then(function(text) {
-                    throw Error('Failed to fetch ' + url + ': ' + text);
-                  });
-                }
-                return response;
+                if (response.ok) return response;
+
+                response.text().then(function(text) {
+                  throw Error('Failed to fetch ' + url + ': ' + text);
+                });
               });
             })
           }
@@ -448,16 +447,16 @@ NetCommonsApp.controller('NetCommons.base',
             recommenderId: 'encourage_submission',
           };
 
-          getIncentiveRecommendation(query).then(function(response) {
-            if (response.content.message) {
-              $("#nc-flash-message div").text(response.content.message);
-              if (response.content.color) {
+          getIncentiveRecommendation(query).then(function(json) {
+            if (json && json.content && json.content.message) {
+              $("#nc-flash-message div").text(json.content.message);
+              if (json.content.color) {
                 $("#nc-flash-message")
                   .removeClass("alert-info")
-                  .addClass("alert-" + response.content.color);
+                  .addClass("alert-" + json.content.color);
               }
-              if (response.content.delay !== 0) {
-                $("#nc-flash-message").delay(response.content.delay || 5000).fadeOut(1000);
+              if (json.content.delay !== 0) {
+                $("#nc-flash-message").delay(json.content.delay || 5000).fadeOut(1000);
               }
               // Remove `style="opacity: 0;"`.
               $("#nc-flash-message").removeAttr('style');
