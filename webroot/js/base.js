@@ -455,11 +455,10 @@ NetCommonsApp.controller('NetCommons.base',
                   .removeClass("alert-info")
                   .addClass("alert-" + json.content.color);
               }
+              $('#nc-flash-message').fadeIn(500);
               if (json.content.delay !== 0) {
                 $("#nc-flash-message").delay(json.content.delay || 5000).fadeOut(1000);
               }
-              // Remove `style="opacity: 0;"`.
-              $("#nc-flash-message").removeAttr('style');
             }
           }).catch(function(error) {
             console.error('updateMotivatingFlashMessage:', error);
