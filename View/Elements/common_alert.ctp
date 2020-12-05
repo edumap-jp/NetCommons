@@ -10,7 +10,7 @@
 ?>
 
 <div id="nc-flash-message" class="alert alert-<?php echo h($class); ?> alert-dismissable"
-	<?php if ($is_dismissed) { echo 'style="opacity: 0; pointer-events: none;"'; } ?>>
+	<?php if ($isDismissed) { echo 'style="opacity: 0; pointer-events: none;"'; } ?>>
 	<button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
 	<div>
 		<?php echo $message; ?>
