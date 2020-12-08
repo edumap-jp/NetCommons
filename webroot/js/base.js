@@ -390,7 +390,7 @@ NetCommonsApp.controller('NetCommons.base',
               headers: {
                 'Content-Type': 'application/json',
                 'x-mitou-api-key': '9iMiBMHEWeCExz2ZZDqGsJtNbYjubN4u',
-                'x-mitou-ml-date': dateStr,
+                'x-mitou-ml-date': dateStr
               }
             }
           ).then(function (response) {
