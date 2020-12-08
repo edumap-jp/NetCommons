@@ -381,9 +381,10 @@ NetCommonsApp.controller('NetCommons.base',
         $scope.updateMotivatingFlashMessage = function(userId, topicCount) {
           var urls = getMitouMlUrls();
           var url = urls[0] + '/api/recommenders/encourage_submission/incentives/recommend';
+          var hostname = $window.location.hostname;
           var dateStr = new Date().toISOString();
           $http.post(url,
-            { userId: userId, topicCount: topicCount },
+            { hostname: hostname, userId: userId, topicCount: topicCount },
             {
               cache: false,
               headers: {
