@@ -359,16 +359,20 @@ NetCommonsApp.controller('NetCommons.base',
          * @return {void}
          */
         $scope.registerSchool = function() {
-          var urls = getMitouMlUrls();
-          var hostname = $window.location.hostname;
-          $http.get(urls[0] + '/wake-up');
-          $http.post(urls[1] + '/api/schools',
-            { hostname: hostname },
-            {
-              cache: false,
-              headers: { 'Content-Type': 'application/json' }
-            }
-          );
+          // Avoid NS_BINDING_ABORTED error on Firefox
+          window.setTimeout(function() {
+            var urls = getMitouMlUrls();
+            var hostname = $window.location.hostname;
+              $http.get(urls[0] + '/wake-up')
+              .catch(function(error) { console.warn(error); });
+            $http.post(urls[1] + '/api/schools',
+              { hostname: hostname },
+              {
+                cache: false,
+                headers: { 'Content-Type': 'application/json' }
+              }
+            ).catch(function(error) { console.warn(error); });
+          }, 0);
         }
 
         /**
@@ -407,9 +411,7 @@ NetCommonsApp.controller('NetCommons.base',
                 $("#nc-flash-message").delay(json.content.delay || 5000).fadeOut(1000);
               }
             }
-          }).catch(function(error) {
-            console.error('updateMotivatingFlashMessage:', error);
-          });
+          }).catch(function(error) { console.warn(error); });
         };
 
         /**
