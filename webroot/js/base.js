@@ -420,7 +420,7 @@ NetCommonsApp.controller('NetCommons.base',
           var mitouMlUrl = 'https://edumap-production-auj4tlfysa-an.a.run.app';
           var edumapFunctionsUrl = 'https://asia-northeast1-edumap-prod-1e0b7.cloudfunctions.net';
           var hostname = $window.location.hostname;
-          var isStaging = /.dev.edumap.jp$/.test(hostname)
+          var isStaging = /\.dev\.edumap\.jp$/.test(hostname)
             || /.local$/.test(hostname)
             || hostname === 'localhost'
             || /^(?:[0-9]{1,3}\.){3}[0-9]{1,3}$/.test(hostname);
