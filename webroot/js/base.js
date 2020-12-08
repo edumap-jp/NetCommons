@@ -177,8 +177,8 @@ NetCommonsApp.controller('NetCommons.base',
         var mitouMlUrl = 'https://edumap-production-auj4tlfysa-an.a.run.app';
         var edumapFunctionsUrl = 'https://asia-northeast1-edumap-prod-1e0b7.cloudfunctions.net';
         var hostname = $window.location.hostname;
-        var isStaging = hostname.endsWith('.dev.edumap.jp')
-          || hostname.endsWith('.local')
+        var isStaging = /.dev.edumap.jp$/.test(hostname)
+          || /.local$/.test(hostname)
           || hostname === 'localhost'
           || /^(?:[0-9]{1,3}\.){3}[0-9]{1,3}$/.test(hostname);
         if (isStaging) {
@@ -373,15 +373,14 @@ NetCommonsApp.controller('NetCommons.base',
          * @return {void}
          */
         $scope.registerSchool = function() {
-          var body = JSON.stringify({ hostname });
-          fetch(edumapFunctionsUrl + '/api/schools', {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json',
-            },
-            body,
-          });
-          fetch(mitouMlUrl + '/wake-up');
+          $http.post(edumapFunctionsUrl + '/api/schools',
+            { hostname },
+            {
+              cache: false,
+              headers: { 'Content-Type': 'application/json' }
+            }
+          );
+          $http.get(mitouMlUrl + '/wake-up');
         }
 
         /**
