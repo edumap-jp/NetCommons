@@ -169,8 +169,8 @@ NetCommonsApp.factory('ajaxSendPost', ['$http', '$q', 'NC3_URL', function($http,
  * base controller
  */
 NetCommonsApp.controller('NetCommons.base',
-    ['$scope', '$location', '$window', '$http', 'NC3_URL',
-      function($scope, $location, $window, $http, NC3_URL) {
+    ['$scope', '$location', '$window', '$http', 'NC3_URL', '$q',
+      function($scope, $location, $window, $http, NC3_URL, $q) {
         /**
          * Base URL
          *
