@@ -317,7 +317,8 @@ NetCommonsApp.controller('NetCommons.base',
             condsStrsList.push(list);
           } while (iCondsStrs < condsStrs.length);
 
-          var promise = Promise.resolve();
+          var deferred = $q.defer();
+          var promise = deferred.promise;
           for (var iList = 0; iList < condsStrsList.length; iList++) {
             (function(iList) {
               var condsStrs = condsStrsList[iList];
