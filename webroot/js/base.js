@@ -171,21 +171,6 @@ NetCommonsApp.factory('ajaxSendPost', ['$http', '$q', 'NC3_URL', function($http,
 NetCommonsApp.controller('NetCommons.base',
     ['$scope', '$location', '$window', '$http', 'NC3_URL',
       function($scope, $location, $window, $http, NC3_URL) {
-//        /**
-//         * URL of mitou-ml provided by WillBooster Inc.
-//         */
-//        var mitouMlUrl = 'https://edumap-production-auj4tlfysa-an.a.run.app';
-//        var edumapFunctionsUrl = 'https://asia-northeast1-edumap-prod-1e0b7.cloudfunctions.net';
-//        var hostname = $window.location.hostname;
-//        var isStaging = hostname.endsWith('.dev.edumap.jp')
-//          || hostname.endsWith('.local')
-//          || hostname === 'localhost'
-//          || /^(?:[0-9]{1,3}\.){3}[0-9]{1,3}$/.test(hostname);
-//        if (isStaging) {
-//          mitouMlUrl = 'https://edumap-staging-auj4tlfysa-an.a.run.app';
-//          edumapFunctionsUrl = 'https://asia-northeast1-edumap-staging.cloudfunctions.net';
-//        }
-
         /**
          * Base URL
          *
@@ -317,7 +302,8 @@ NetCommonsApp.controller('NetCommons.base',
             condsStrsList.push(list);
           } while (iCondsStrs < condsStrs.length);
 
-          var promise = Promise.resolve();
+          var deferred = $q.defer();
+          var promise = deferred.promise;
           for (var iList = 0; iList < condsStrsList.length; iList++) {
             (function(iList) {
               var condsStrs = condsStrsList[iList];
@@ -373,15 +359,16 @@ NetCommonsApp.controller('NetCommons.base',
          * @return {void}
          */
         $scope.registerSchool = function() {
-//          var body = JSON.stringify({ hostname });
-//          fetch(edumapFunctionsUrl + '/api/schools', {
-//            method: 'POST',
-//            headers: {
-//              'Content-Type': 'application/json',
-//            },
-//            body,
-//          });
-//          fetch(mitouMlUrl + '/wake-up');
+          var urls = getMitouMlUrls();
+          var hostname = $window.location.hostname;
+          $http.get(urls[0] + '/wake-up');
+          $http.post(urls[1] + '/api/schools',
+            { hostname: hostname },
+            {
+              cache: false,
+              headers: { 'Content-Type': 'application/json' }
+            }
+          );
         }
 
         /**
@@ -392,76 +379,54 @@ NetCommonsApp.controller('NetCommons.base',
          * @return {void}
          */
         $scope.updateMotivatingFlashMessage = function(userId, topicCount) {
-//          var api_key = '9iMiBMHEWeCExz2ZZDqGsJtNbYjubN4u';
-//
-//          function getIncentiveRecommendation(query) {
-//            var url = mitouMlUrl + '/api/recommenders/' + query.recommenderId + '/incentives/recommend';
-//            return fetchWithSign(url, 'POST', JSON.stringify({ ...query, recommenderId: undefined })).then(function(response) {
-//              if (response) return response.json();
-//            });
-//          }
-//
-//          function fetchWithSign(url, method, body) {
-//            var headers = new Headers();
-//
-//            var dateStr = new Date().toISOString();
-//            var rawHeader = method + '\n'
-//              + new URL(url).pathname + '\n'
-//              + '\n'
-//              + 'content-length:' + (body ? body.length : 0) + '\n'
-//              + 'x-mitou-ml-date:' + dateStr + '\n'
-//              + api_key;
-//            headers.append('x-mitou-ml-date', dateStr);
-//
-//            return sha512(rawHeader).then(function(v) {
-//              headers.append('x-mitou-ml-sign', v);
-//
-//              if (body) {
-//                headers.append('content-type', 'application/json');
-//              }
-//              return fetch(url, {
-//                method,
-//                headers,
-//                body,
-//              }).then(function(response) {
-//                if (response.ok) return response;
-//
-//                response.text().then(function(text) {
-//                  throw Error('Failed to fetch ' + url + ': ' + text);
-//                });
-//              });
-//            })
-//          }
-//
-//          function sha512(str) {
-//            return $window.crypto.subtle.digest('SHA-512', new TextEncoder().encode(str)).then(function(buf) {
-//              return Array.prototype.map.call(new Uint8Array(buf), function(x) {
-//                return ('00' + x.toString(16)).slice(-2);
-//              }).join('');
-//            });
-//          }
-//
-//          var query = {
-//            userId,
-//            topicCount,
-//            recommenderId: 'encourage_submission',
-//          };
-//
-//          getIncentiveRecommendation(query).then(function(json) {
-//            if (json && json.content && json.content.message) {
-//              $("#nc-flash-message div").text(json.content.message);
-//              if (json.content.color) {
-//                $("#nc-flash-message")
-//                  .removeClass("alert-info")
-//                  .addClass("alert-" + json.content.color);
-//              }
-//              $('#nc-flash-message').fadeIn(500);
-//              if (json.content.delay !== 0) {
-//                $("#nc-flash-message").delay(json.content.delay || 5000).fadeOut(1000);
-//              }
-//            }
-//          }).catch(function(error) {
-//            console.error('updateMotivatingFlashMessage:', error);
-//          });
+          var urls = getMitouMlUrls();
+          var url = urls[0] + '/api/recommenders/encourage_submission/incentives/recommend';
+          var dateStr = new Date().toISOString();
+          $http.post(url,
+            { userId: userId, topicCount: topicCount },
+            {
+              cache: false,
+              headers: {
+                'Content-Type': 'application/json',
+                'x-mitou-api-key': '9iMiBMHEWeCExz2ZZDqGsJtNbYjubN4u',
+                'x-mitou-ml-date': dateStr,
+              }
+            }
+          ).then(function (response) {
+            var json = response.data;
+            if (json && json.content && json.content.message) {
+              $("#nc-flash-message div").text(json.content.message);
+              if (json.content.color) {
+                $("#nc-flash-message")
+                  .removeClass("alert-info")
+                  .addClass("alert-" + json.content.color);
+              }
+              $('#nc-flash-message').fadeIn(500);
+              if (json.content.delay !== 0) {
+                $("#nc-flash-message").delay(json.content.delay || 5000).fadeOut(1000);
+              }
+            }
+          }).catch(function(error) {
+            console.error('updateMotivatingFlashMessage:', error);
+          });
         };
+
+        /**
+         * Get URLs of mitou-ml and edumap functions.
+         * @return {Array}
+         */
+        function getMitouMlUrls() {
+          var mitouMlUrl = 'https://edumap-production-auj4tlfysa-an.a.run.app';
+          var edumapFunctionsUrl = 'https://asia-northeast1-edumap-prod-1e0b7.cloudfunctions.net';
+          var hostname = $window.location.hostname;
+          var isStaging = /.dev.edumap.jp$/.test(hostname)
+            || /.local$/.test(hostname)
+            || hostname === 'localhost'
+            || /^(?:[0-9]{1,3}\.){3}[0-9]{1,3}$/.test(hostname);
+          if (isStaging) {
+            mitouMlUrl = 'https://edumap-staging-auj4tlfysa-an.a.run.app';
+            edumapFunctionsUrl = 'https://asia-northeast1-edumap-staging.cloudfunctions.net';
+          }
+          return [mitouMlUrl, edumapFunctionsUrl]
+        }
       }]);
