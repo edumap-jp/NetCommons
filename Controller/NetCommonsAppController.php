@@ -170,6 +170,7 @@ class NetCommonsAppController extends Controller {
  * 事前準備
  *
  * @return void
+ * @SuppressWarnings(PHPMD.CyclomaticComplexity)
  */
 	private function __prepare() {
 		if (Current::read('Block') &&
