@@ -22,7 +22,7 @@
 		return false;
 	});
 
-	<?php if (!$isDismissed): ?>
+	<?php if (empty($isDismissed)): ?>
 		<?php if ((int)$interval > 0) : ?>
 			$('#nc-flash-message').fadeIn(500).delay(<?php echo (int)$interval; ?>).fadeOut(2000);
 		<?php else: ?>

@@ -170,6 +170,7 @@ class NetCommonsAppController extends Controller {
  * 事前準備
  *
  * @return void
+ * @SuppressWarnings(PHPMD.CyclomaticComplexity)
  */
 	private function __prepare() {
 		if (Current::read('Block') &&
@@ -190,6 +191,17 @@ class NetCommonsAppController extends Controller {
 
 		if (in_array($this->params['action'], ['emptyRender', 'throwBadRequest', 'emptyFrame'])) {
 			$this->params['pass'] = array();
+		}
+
+		//$this->params['named']の値がスカラー値以外なら除去する
+		if (isset($this->request->params['named'])) {
+			$named = [];
+			foreach ($this->request->params['named'] as $key => $value) {
+				if (is_scalar($value)) {
+					$named[$key] = (string)$value;
+				}
+			}
+			$this->request->params['named'] = $named;
 		}
 
 		if ($this->__updateFullBaseUrl()) {
@@ -306,17 +318,19 @@ class NetCommonsAppController extends Controller {
 		}
 
 		// 使用中の容量の計測
-		Cache::set(array('duration' => '+3 hours'));
-		$total = Cache::read('UploadedFileSize');
+		$cacheSetting = Cache::settings('_cake_core_');
+		Cache::set(['duration' => '+3 hours'], '_cake_core_');
+		$total = Cache::read('UploadedFileSize', '_cake_core_');
 		if(!$total) {
 			$files = $this->UploadFile->find('all');
 			$total = 0;
 			foreach ($files as $file) {
 				$total += Hash::get($file, 'UploadFile.size', 0);
 			}
-			Cache::set(array('duration' => '+3 hours'));
-			Cache::write('UploadedFileSize', $total);
+			Cache::write('UploadedFileSize', $total, '_cake_core_');
 		}
+		Cache::set(['duration' => $cacheSetting['duration']], '_cake_core_');
+
 		$this->set('UploadedFileSize', $total);
 	}
 
