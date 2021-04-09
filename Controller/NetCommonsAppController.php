@@ -197,6 +197,16 @@ class NetCommonsAppController extends Controller {
 			}
 			$this->request->params['named'] = $named;
 		}
+
+		if (empty($this->request->params['requested'])) {
+			//非推奨ブラウザチェック
+			/** @var \DeprecatedBrowserComponent $DeprecatedBrowser */
+			$DeprecatedBrowser = $this->Components->load('NetCommons.DeprecatedBrowser');
+			$DeprecatedBrowser->initialize($this);
+			if ($DeprecatedBrowser->isDeprecatedBrowser()) {
+				$DeprecatedBrowser->setFlashNotification();
+			}
+		}
 	}
 
 /**
