@@ -37,6 +37,13 @@ class DeprecatedBrowserComponent extends Component {
 	public $controller;
 
 /**
+ * メッセージ
+ *
+ * @var string
+ */
+	private $__flashMessage;
+
+/**
  * Called before the Controller::beforeFilter().
  *
  * @param Controller $controller Instantiating controller
@@ -44,6 +51,11 @@ class DeprecatedBrowserComponent extends Component {
  */
 	public function initialize(Controller $controller) {
 		$this->controller = $controller;
+		$this->__flashMessage = __d(
+			'net_commons',
+			'Internet Explorer(IE) is deprecated. ' .
+				'If you are using IE, please change to the latest version such as Edge, Chrome, Firefox, etc.'
+		);
 	}
 
 /**
@@ -53,7 +65,17 @@ class DeprecatedBrowserComponent extends Component {
  */
 	public function isDeprecatedBrowser() {
 		$browser = strtolower(env('HTTP_USER_AGENT'));
-		return (strstr($browser , 'trident') || strstr($browser , 'msie'));
+		return (strstr($browser, 'trident') || strstr($browser, 'msie'));
+	}
+
+/**
+ * 非推奨ブラウザエラーメッセージをセットする
+ *
+ * @param strin $message メッセージ
+ * @return void
+ */
+	public function setFlashMessage(string $message) {
+		$this->__flashMessage = $message;
 	}
 
 /**
@@ -67,8 +89,7 @@ class DeprecatedBrowserComponent extends Component {
 		}
 
 		$this->controller->NetCommons->setFlashNotification(
-			__d('net_commons', 'Internet Explorer(IE) is deprecated. ' .
-				'If you are using IE, please change to the latest version such as Edge, Chrome, Firefox, etc.'),
+			$this->__flashMessage,
 			['class' => 'danger', 'interval' => 10000]
 		);
 		$this->controller->Session->write('NetCommons.DeprecatedBrowser', true);
