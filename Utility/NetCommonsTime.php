@@ -218,13 +218,13 @@ class NetCommonsTime {
 			return date($format, strtotime($date));
 
 		} elseif ($this->_isToday($date)) {
-			return date('G:i', strtotime($date));
+			return date('m/d G:i', strtotime($date));
 
 		} elseif (! $this->_isThisYear($date)) {
 			return date('Y/m/d', strtotime($date));
 
 		} else {
-			return date('m/d', strtotime($date));
+			return date('m/d G:i', strtotime($date));
 		}
 	}
 
