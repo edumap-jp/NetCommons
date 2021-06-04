@@ -22,14 +22,14 @@ class NetCommonsDataServer {
  * データサーバにPostリクエストを送信しレスポンスをJSONで取得する。
  *
  * @param string $path パス
- * @param array $requestBody Body/クエリ
+ * @param array $requestBody Body
  *
  * @throws RuntimeException 通信エラー
  *
  * @return array
  */
-   static public function post($path, $requestBody) {
-		$url = SiteSettingUtil::read('DataServer.data_server_url', 'http://data:3000') . $path;
+	static public function post($path, $requestBody = null) {
+		$url = Self::__url() . $path;
 
 		$curl = curl_init($url);
 		curl_setopt($curl, CURLOPT_POST, true);
@@ -37,6 +37,55 @@ class NetCommonsDataServer {
 		if (isset($requestBody)) {
 			curl_setopt($curl, CURLOPT_POSTFIELDS, json_encode($requestBody));
 		}
+		$result = Self::__request($curl);
+		return json_decode($result, true);
+	}
+
+/**
+ * データサーバにGetリクエストを送信しレスポンスをJSONで取得する。
+ *
+ * @param string $path パス
+ * @param array $requestQuery クエリ
+ *
+ * @throws RuntimeException 通信エラー
+ *
+ * @return array
+ */
+	static public function get($path, $requestQuery = null) {
+		$url = Self::__url() . $path;
+		if (isset($requestQuery)) {
+			$data = http_build_query($requestQuery);
+			if (strpos($path, '?') !== false) {
+				$url = $url . '&' . $data;
+			} else {
+				$url = $url . '?' . $data;
+			}
+		}
+
+		$curl = curl_init($url);
+		$result = Self::__request($curl);
+		return json_decode($result, true);
+	}
+
+/**
+ * データサーバのURL
+ *
+ * @return string
+ */
+	static private function __url() {
+		return SiteSettingUtil::read('DataServer.data_server_url', 'http://data:3000');
+	}
+
+/**
+ * データサーバにリクエストを送信する
+ *
+ * @param curl $curl curl
+ *
+ * @throws RuntimeException 通信エラー
+ *
+ * @return array
+ */
+	static private function __request($curl) {
 		curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
 		$result = curl_exec($curl);
 		$errno = curl_errno($curl);
@@ -46,9 +95,9 @@ class NetCommonsDataServer {
 		if ($errno !== CURLE_OK) {
 			throw new RuntimeException($error, $errno);
 		}
-		if ($code !== 200) {
+		if ($code !== 200 && $code !== 202) {
 			throw new RuntimeException($code . ': ' . $result);
 		}
-		return json_decode($result, true);
-    }
+		return $result;
+	}
 }
