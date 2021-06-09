@@ -34,6 +34,7 @@ if (! $titleIconUrl) :
 endif;
 ?>
 NetCommonsApp.constant('TITLE_ICON_URL', '<?php echo h($titleIconUrl); ?>');
+NetCommonsApp.constant('DATA_SERVER_URL', '<?php echo SiteSettingUtil::read('DataServer.data_server_url', 'http://data:3000'); ?>');
 </script>
 
 <?php echo $this->NetCommonsHtml->script('/users/js/users.js');
