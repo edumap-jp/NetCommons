@@ -434,4 +434,13 @@ NetCommonsApp.controller('NetCommons.base',
           }
           return [mitouMlUrl, edumapFunctionsUrl]
         }
+
+        /**
+         * データ管理サーバへの通知
+         *
+         * @return {void}
+         */
+        $scope.notifyDataServer = function() {
+          $http.get(NC3_URL + '/net_commons/net_commons/notify_data_server.json');
+        };
       }]);

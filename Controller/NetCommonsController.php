@@ -9,6 +9,7 @@
  */
 
 App::uses('NetCommonsAppController', 'NetCommons.Controller');
+App::uses('NotifyDataServerToFetch', 'NetCommons.Utility');
 
 /**
  * NetCommons Controller
@@ -27,7 +28,7 @@ class NetCommonsController extends NetCommonsAppController {
  */
 	public function beforeFilter() {
 		parent::beforeFilter();
-		$this->Auth->allow('csrfToken');
+		$this->Auth->allow('csrfToken', 'notify_data_server');
 	}
 
 /**
@@ -50,5 +51,17 @@ class NetCommonsController extends NetCommonsAppController {
 
 		$this->set(compact('data'));
 		$this->set('_serialize', array('data'));
+	}
+
+/**
+ * データ管理サーバへの通知
+ *
+ * @return void
+ */
+	public function notify_data_server() {
+		if (NotifyDataServerToFetch::isTimedNotify()) {
+			NotifyDataServerToFetch::notifyOnTime();
+		}
+		$this->NetCommons->renderJson();
 	}
 }

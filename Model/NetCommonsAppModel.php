@@ -15,6 +15,7 @@
 App::uses('Model', 'Model');
 App::uses('NetCommonsCDNCache', 'NetCommons.Utility');
 App::uses('ValidateMerge', 'NetCommons.Utility');
+App::uses('NotifyDataServerToFetch', 'NetCommons.Utility');
 
 /**
  * NetCommonsApp Model
@@ -336,6 +337,11 @@ class NetCommonsAppModel extends Model {
 		if ($this->invalidateCDN) {
 			$cdnCache = new NetCommonsCDNCache();
 			$cdnCache->invalidate();
+		}
+
+		//データ管理サーバに通知する
+		if (NotifyDataServerToFetch::isset()) {
+			NotifyDataServerToFetch::notify();
 		}
 	}
 
