@@ -151,7 +151,7 @@ class NetCommonsExceptionRenderer extends ExceptionRenderer {
 			$redirect = $this->controller->request->referer(true);
 
 		} elseif ($this->_is403And404And408($error)) {
-			list($redirect, $redirectUrl) = $this->_get403And404Redirect();
+			list($redirect, $redirectUrl) = $this->_get403And404Redirect($error);
 			if (! $this->controller->request->is('ajax') &&
 					$this->__loadedAuthComponent()) {
 				$this->controller->Auth->redirectUrl($redirectUrl);
@@ -219,7 +219,7 @@ class NetCommonsExceptionRenderer extends ExceptionRenderer {
  *
  * @return array array($redirect, $redirectUrl)
  */
-	protected function _get403And404Redirect() {
+	protected function _get403And404Redirect($error) {
 		if ($this->__isLoggedIn()) {
 			$referer = Router::parse($this->controller->request->referer(true));
 			$here = Router::parse($this->controller->request->here(false));
@@ -239,7 +239,11 @@ class NetCommonsExceptionRenderer extends ExceptionRenderer {
 				$redirectUrl = '/';
 			}
 		} else {
-			$redirect = '/auth/login';
+			if (get_class($error) === 'MissingControllerException') {
+				$redirect = '/';
+			} else {
+				$redirect = '/auth/login';
+			}
 			//$this->controller->Session->destroy();
 
 			App::uses('Current', 'NetCommons.Utility');
