@@ -60,6 +60,13 @@ class AccessCtrlComponent extends Component {
 
 		//サイト閉鎖のチェック
 		if ($netCommonsSecurity->isCloseSite($controller)) {
+			//校章は学校情報プラグインで判断するためtrueで返す
+			if ($controller->params['plugin'] === 'school_informations' &&
+					$controller->params['controller'] === 'school_informations' &&
+					$controller->params['action'] === 'school_badge') {
+				return true;
+			}
+
 			if ($controller->Auth->user()) {
 				throw new ForbiddenException('Under maintenance');
 			} else {
