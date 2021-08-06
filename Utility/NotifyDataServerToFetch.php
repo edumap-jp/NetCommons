@@ -78,7 +78,7 @@ class NotifyDataServerToFetch {
 			'hostname' => $edmKey,
 		];
 		try {
-			NetCommonsDataServer::get('/topics/fetch/specific-hostname', $query);
+			NetCommonsDataServer::get('/jobs/sync_immediately', $query);
 		}
 		catch (exception $e) {}
 
