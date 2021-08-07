@@ -48,6 +48,8 @@ class AddRecordDataServerUrl extends NetCommonsMigration {
 			array(
 				'language_id' => '0',
 				'key' => 'DataServer.data_server_url',
+				//検証環境や動作確認環境では、
+				//rundeckの/opt/scripts/app_docker/setup_site_nc3_json.shに設定変更スクリプト追加している
 				'value' => 'https://data-mng.edumap.jp',
 			),
 		),
