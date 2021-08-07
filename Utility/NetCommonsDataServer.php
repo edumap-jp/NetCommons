@@ -73,7 +73,7 @@ class NetCommonsDataServer {
  * @return string
  */
 	static private function __url() {
-		return SiteSettingUtil::read('DataServer.data_server_url', 'http://data:3000');
+		return SiteSettingUtil::read('DataServer.data_server_url', 'https://data-mng.edumap.jp');
 	}
 
 /**
