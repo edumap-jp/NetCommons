@@ -48,7 +48,7 @@ class AddRecordDataServerUrl extends NetCommonsMigration {
 			array(
 				'language_id' => '0',
 				'key' => 'DataServer.data_server_url',
-				'value' => 'http://data:3000',
+				'value' => 'https://data-mng.edumap.jp',
 			),
 		),
 	);
