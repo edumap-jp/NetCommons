@@ -12,6 +12,7 @@
 App::uses('NetCommonsDataServer', 'NetCommons.Utility');
 App::uses('NetCommonsCache', 'NetCommons.Utility');
 App::uses('NetCommonsCDNCache', 'NetCommons.Utility');
+App::uses('Space', 'Rooms.Model');
 
 /**
  * DataSeverにプッシュ通知するUtility
@@ -98,13 +99,20 @@ class NotifyDataServerToFetch {
 	private static function __getDbNotifyTime() {
 		$now = (new DateTime('now', (new DateTimeZone('UTC'))))->format('Y-m-d H:i:s');
 
+		/** @var Room $Room */
+		$Room = ClassRegistry::init('Rooms.Room');
+		$roomIds = self::__getPublicRoomIds($Room);
+		if (empty($roomIds)) {
+			return 0;
+		}
+
 		/** @var Block $Block */
 		$Block = ClassRegistry::init('Blocks.Block');
-		$blockPublishTime = self::__getDbPublishTime($Block, $now);
+		$blockPublishTime = self::__getDbPublishTime($Block, $now, $roomIds);
 
 		/** @var Topic $Topic */
 		$Topic = ClassRegistry::init('Topics.Topic');
-		$topicPublishTime = self::__getDbPublishTime($Topic, $now);
+		$topicPublishTime = self::__getDbPublishTime($Topic, $now, $roomIds);
 
 		return self::__compareNotifyTime($blockPublishTime, $topicPublishTime);
 	}
@@ -152,16 +160,42 @@ class NotifyDataServerToFetch {
 	}
 
 /**
+ * パブリックスペース内にあるルームIDのリストを返す
+ *
+ * @param Model $model 実行するModel
+ *
+ * @return array
+ */
+	private static function __getPublicRoomIds(Model $model) {
+		$table = $model->tablePrefix . $model->table;
+		$alias = $model->alias;
+
+		$sql = 'SELECT' .
+				' ' . $alias . '.id ' .
+				'FROM ' . $table . ' ' . $alias . ' ' .
+				'WHERE ' . $alias . '.space_id = \'' . \Space::PUBLIC_SPACE_ID . '\'';
+		$rooms = $model->query($sql);
+
+		$roomIds = [];
+		foreach ($rooms as $room) {
+			$roomIds[] = $room[$alias]['id'];
+		}
+
+		return $roomIds;
+	}
+
+/**
  * DBから現在から直近の公開時刻を取得
  *
  * 戻り値は、公開開始時刻と公開終了時刻の小さい方を返す
  *
  * @param Model $model 実行するModel
  * @param string $now 現在時刻(Y-m-d H:i:s)
+ * @param array $roomIds ルームIDリスト
  *
  * @return string |null
  */
-	private static function __getDbPublishTime(Model $model, $now) {
+	private static function __getDbPublishTime(Model $model, $now, $roomIds) {
 		$table = $model->tablePrefix . $model->table;
 		$alias = $model->alias;
 
@@ -172,15 +206,16 @@ class NotifyDataServerToFetch {
 		$sql = 'SELECT' .
 				' MIN(' . $alias . '.publish_start) AS ' . $alias . '__min_publish_start ' .
 				'FROM ' . $table . ' ' . $alias . ' ' .
-				'WHERE ' . $alias . '.room_id = \'1\' ' .
+				'WHERE ' . $alias . '.room_id IN (\'' . implode('\',\'', $roomIds) . '\') ' .
 				'AND ' . $alias . '.publish_start > \'' . $now . '\'';
+
 		$publish = $model->query($sql);
 		$publishStart = $publish[0][$alias]['min_publish_start'] ?? null;
 
 		$sql = 'SELECT' .
 				' MIN(' . $alias . '.publish_end) AS ' . $alias . '__min_publish_end ' .
 				'FROM ' . $table . ' ' . $alias . ' ' .
-				'WHERE ' . $alias . '.room_id = \'1\' ' .
+				'WHERE ' . $alias . '.room_id IN (\'' . implode('\',\'', $roomIds) . '\') ' .
 				'AND ' . $alias . '.publish_end > \'' . $now . '\'';
 		$publish = $model->query($sql);
 		$publishEnd = $publish[0][$alias]['min_publish_end'] ?? null;
