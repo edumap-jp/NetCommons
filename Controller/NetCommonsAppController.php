@@ -216,7 +216,12 @@ class NetCommonsAppController extends Controller {
 		//}
 
 		if ($this->__updateFullBaseUrl()) {
-			$this->redirect($this->request->here);
+			if (!empty($this->request->query)) {
+				$queryString = '?' . http_build_query($this->request->query);
+			} else {
+				$queryString = '';
+			}
+			$this->redirect($this->request->here . $queryString);
 		}
 	}
 
