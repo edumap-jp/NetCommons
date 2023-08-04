@@ -7,9 +7,16 @@
  * @link http://www.netcommons.org NetCommons Project
  * @license http://www.netcommons.org/license.txt NetCommons License
  */
+if (!empty($isDismissed)) {
+	$fadeInInterval = 1000;
+	$displayflashMess = ' style="display: none;"';
+} else {
+	$fadeInInterval = 500;
+	$displayflashMess = '';
+}
 ?>
 
-<div id="nc-flash-message" class="alert alert-<?php echo h($class); ?> alert-dismissable">
+<div id="nc-flash-message" class="alert alert-<?php echo h($class); ?> alert-dismissable"<?php echo $displayflashMess; ?>>
 	<button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
 	<div>
 		<?php echo $message; ?>
@@ -22,13 +29,9 @@
 		return false;
 	});
 
-	<?php if (empty($isDismissed)): ?>
-		<?php if ((int)$interval > 0) : ?>
-			$('#nc-flash-message').fadeIn(500).delay(<?php echo (int)$interval; ?>).fadeOut(2000);
-		<?php else: ?>
-			$('#nc-flash-message').fadeIn(500);
-		<?php endif; ?>
+	<?php if ((int)$interval > 0) : ?>
+		$('#nc-flash-message').fadeIn(<?php echo (int)$fadeInInterval; ?>).delay(<?php echo (int)$interval; ?>).fadeOut(2000);
 	<?php else: ?>
-		$('#nc-flash-message').fadeOut(0);
+		$('#nc-flash-message').fadeIn(<?php echo (int)$fadeInInterval; ?>);
 	<?php endif; ?>
 </script>
