@@ -71,7 +71,7 @@ class NotifyDataServerToFetch {
 		/** @var SchoolInformation $SchoolInformation */
 		$SchoolInformation = ClassRegistry::init('SchoolInformations.SchoolInformation');
 
-		$edmKey = $SchoolInformation->getSchoolInformation()['SchoolInformation']['edumap_key'];
+		$edmKey = $SchoolInformation->getSchoolInformation()['SchoolInformation']['edumap_key'] ?? null;
 		if (empty($edmKey)) {
 			return;
 		}
