@@ -392,7 +392,10 @@ class NetCommonsHtmlHelper extends AppHelper {
 		if (strncmp($url, '/', 1) === 0 && strpos($url, 'bootstrap.min.css') == false
 				&& strpos($url, 'tinymce.min.js') == false) {
 			$httpHost = $_SERVER['HTTP_HOST'] ?? '';
-			$url = 'https://' . substr($httpHost, 7) . $url;
+
+			$baseUrl = Configure::read('App.fullBaseUrl');
+			$httpScheme = substr($baseUrl, 0, strpos($baseUrl, ':'));
+			$url = $httpScheme . '://' . substr($httpHost, 7) . $url;
 		}
 		return $url;
 	}
