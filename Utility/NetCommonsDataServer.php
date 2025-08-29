@@ -92,11 +92,8 @@ class NetCommonsDataServer {
 		$error = curl_error($curl);
 		$code = curl_getinfo($curl, CURLINFO_RESPONSE_CODE);
 		curl_close($curl);
-		if ($errno !== CURLE_OK) {
-			throw new RuntimeException($error, $errno);
-		}
-		if ($code !== 200 && $code !== 202) {
-			throw new RuntimeException($code . ': ' . $result);
+		if ($errno !== CURLE_OK || ($code !== 200 && $code !== 202)) {
+			throw new BadRequestException(__d('net_commons', 'Bad Request'));
 		}
 		return $result;
 	}
